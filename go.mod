@@ -1,4 +1,4 @@
-module github.com/karanveersp/store
+module github.com/harenber/store
 
 go 1.20
 
