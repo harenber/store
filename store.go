@@ -23,20 +23,20 @@ type UnmarshalFunc func(data []byte, v any) error
 
 var (
 	applicationName = ""
-	formats         = map[string]format{}
+	formats         = map[string]Format{}
 )
 
-type format struct {
+type Format struct {
 	m  MarshalFunc
 	um UnmarshalFunc
 }
 
 func init() {
-	formats["json"] = format{m: json.Marshal, um: json.Unmarshal}
-	formats["yaml"] = format{m: yaml.Marshal, um: yaml.Unmarshal}
-	formats["yml"] = format{m: yaml.Marshal, um: yaml.Unmarshal}
+	formats["json"] = Format{m: json.Marshal, um: json.Unmarshal}
+	formats["yaml"] = Format{m: yaml.Marshal, um: yaml.Unmarshal}
+	formats["yml"] = Format{m: yaml.Marshal, um: yaml.Unmarshal}
 
-	formats["toml"] = format{
+	formats["toml"] = Format{
 		m: func(v any) ([]byte, error) {
 			b := bytes.Buffer{}
 			err := toml.NewEncoder(&b).Encode(v)
@@ -58,13 +58,13 @@ func Init(application string) {
 
 // Register is the way you register configuration formats, by mapping some
 // file name extension to corresponding marshal and unmarshal functions.
-// Once registered, the format given would be compatible with Load and Save.
+// Once registered, the Format given would be compatible with Load and Save.
 func Register(extension string, m MarshalFunc, um UnmarshalFunc) {
-	formats[extension] = format{m, um}
+	formats[extension] = Format{m, um}
 }
 
 // Load reads a configuration from `path` and puts it into `v` pointer. Store
-// supports either JSON, TOML or YAML and will deduce the file format out of
+// supports either JSON, TOML or YAML and will deduce the file Format out of
 // the filename (.json/.toml/.yaml). For other formats of custom extensions
 // please you LoadWith.
 //
@@ -82,11 +82,11 @@ func Load(path string, v any) error {
 		return LoadWith(path, v, format.um)
 	}
 
-	panic("store: unknown configuration format")
+	panic("store: unknown configuration Format")
 }
 
 // Save puts a configuration from `v` pointer into a file `path`. Store
-// supports either JSON, TOML or YAML and will deduce the file format out of
+// supports either JSON, TOML or YAML and will deduce the file Format out of
 // the filename (.json/.toml/.yaml). For other formats of custom extensions
 // please you LoadWith.
 //
@@ -102,7 +102,7 @@ func Save(path string, v any) error {
 		return SaveWith(path, v, format.m)
 	}
 
-	panic("store: unknown configuration format")
+	panic("store: unknown configuration Format")
 }
 
 // LoadWith loads the configuration using any unmarshaler at all.
